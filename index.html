@@ -14,6 +14,17 @@
   --amber:#ffd23f;--red:#ff5c6c;--r:18px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+/* แถบเลื่อนธีมดำเขียว */
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--green2),var(--green3));border-radius:99px;border:3px solid var(--bg)}
+.card ::-webkit-scrollbar-thumb,.opts::-webkit-scrollbar-thumb,.clog::-webkit-scrollbar-thumb{border-color:var(--panel)}
+.checkin::-webkit-scrollbar-thumb{border-color:var(--panel)}
+::-webkit-scrollbar-thumb:hover{background:var(--green)}
+::-webkit-scrollbar-corner{background:transparent}
+::-webkit-scrollbar-button{display:none;width:0;height:0}
+/* Firefox ใช้แบบมาตรฐาน */
+@supports not selector(::-webkit-scrollbar){*{scrollbar-width:thin;scrollbar-color:var(--green2) transparent}}
 html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Kanit',system-ui,sans-serif;font-size:16px}
 body{min-height:100vh;background:
   radial-gradient(900px 500px at 10% -10%,rgba(57,255,136,.10),transparent 60%),
@@ -228,9 +239,10 @@ select:focus,input:focus{border-color:var(--green2);box-shadow:0 0 0 3px var(--g
 <script>
 /* =================== เวอร์ชัน =================== */
 // อัปเดตทุกครั้งที่ปล่อยเวอร์ชันใหม่ (ดูรายละเอียดใน CHANGELOG.md)
-const APP_VERSION = '1.7.1';
+const APP_VERSION = '1.7.2';
 const APP_RELEASED = '2026-11-14';
 const CHANGELOG = [
+  ['1.7.2', '2026-11-14', ['แถบเลื่อนเป็นธีมดำเขียวให้เข้ากับหน้าเว็บ']],
   ['1.7.1', '2026-11-14', ['ปุ่มยืนยันเข้าเรียนไม่หลุดจอแล้ว: บนคอมฟอร์มติดอยู่กับที่ รายชื่อเลื่อนในกรอบของตัวเอง', 'มือถือมีปุ่มลอย "ไปเช็คชื่อ"', 'รายชื่อแสดงทีละ 60 คน รองรับห้องใหญ่หลักพันคน']],
   ['1.7.0', '2026-11-14', ['ยกเลิกโหมดเดโม ใช้ข้อมูลจาก Google Sheet อย่างเดียว', 'เอารายชื่อและข้อมูลตัวอย่างออกจากหน้าเว็บ']],
   ['1.6.0', '2026-11-14', ['สร้างฐานข้อมูล Google Sheet พร้อมรับข้อมูลเช็คชื่อ', 'Apps Script ผูกกับชีตใน Google Drive', 'ชีตสรุปสถิติรายคนด้วยสูตร']],
