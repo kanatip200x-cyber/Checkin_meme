@@ -4,7 +4,7 @@
 ธีมดำ-เขียวสไตล์มีม ใช้ได้ทั้ง PC, แท็บเล็ต และมือถือ
 
 🌐 **เว็บไซต์:** https://kanatip200x-cyber.github.io/Checkin_meme/
-📦 **เวอร์ชันปัจจุบัน:** v1.7.0 — ดู [CHANGELOG.md](CHANGELOG.md)
+📦 **เวอร์ชันปัจจุบัน:** v1.7.1 — ดู [CHANGELOG.md](CHANGELOG.md)
 
 ## ความสามารถ
 

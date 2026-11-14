@@ -68,7 +68,17 @@ button,input,select{font:inherit;color:inherit}
 /* ---------- layout ---------- */
 .grid{display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
 .grid>*{min-width:0}
-@media(min-width:920px){.grid{grid-template-columns:400px minmax(0,1fr)}.checkin{position:sticky;top:14px;align-self:start}}
+@media(min-width:920px){.grid{grid-template-columns:400px minmax(0,1fr)}
+  /* ฟอร์มเช็คชื่อติดอยู่กับที่และเลื่อนในตัวเองได้ ปุ่มยืนยันจึงไม่หลุดจอ */
+  .checkin{position:sticky;top:14px;align-self:start;max-height:calc(100vh - 28px);overflow-y:auto;overscroll-behavior:contain}
+  /* รายชื่อเลื่อนอยู่ในกรอบของตัวเอง ไม่ดันหน้าทั้งหน้า */
+  .list{max-height:calc(100vh - 210px);overflow-y:auto;padding-right:6px;overscroll-behavior:contain}}
+.more{width:100%;margin-top:4px;padding:12px;border:1px dashed var(--green3);border-radius:12px;background:transparent;color:var(--green);cursor:pointer}
+.more small{display:block;color:var(--muted)}
+.fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:40;display:none;border:0;border-radius:99px;padding:14px 20px;font-weight:700;font-size:16px;
+  color:#03140a;background:linear-gradient(180deg,var(--green),var(--green2));box-shadow:0 4px 0 var(--green3),0 8px 24px rgba(0,0,0,.5);cursor:pointer}
+.fab.show{display:block;animation:boing .35s cubic-bezier(.2,1.6,.4,1)}
+@media(min-width:920px){.fab{display:none!important}}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:6px 6px 0 #000}
 .card h2{margin:0 0 4px;font-size:22px;font-weight:700}
 .hint{color:var(--muted);font-size:14px;margin:0 0 12px}
@@ -128,6 +138,7 @@ select:focus,input:focus{border-color:var(--green2);box-shadow:0 0 0 3px var(--g
 .tab.on{background:var(--green);color:#03140a;border-color:var(--green);font-weight:700}
 .search{flex:1 1 200px;max-width:320px}
 .list{display:flex;flex-direction:column;gap:8px}
+.list>*{flex-shrink:0}
 .item{border:1px solid var(--line);border-radius:14px;background:var(--panel2);overflow:hidden;transition:border-color .2s}
 .item.open{border-color:var(--green3);box-shadow:0 0 0 1px var(--green3),0 0 24px rgba(57,255,136,.08)}
 .ih{width:100%;display:flex;align-items:center;gap:12px;padding:10px 12px;background:none;border:0;text-align:left;cursor:pointer}
@@ -217,9 +228,10 @@ select:focus,input:focus{border-color:var(--green2);box-shadow:0 0 0 3px var(--g
 <script>
 /* =================== เวอร์ชัน =================== */
 // อัปเดตทุกครั้งที่ปล่อยเวอร์ชันใหม่ (ดูรายละเอียดใน CHANGELOG.md)
-const APP_VERSION = '1.7.0';
+const APP_VERSION = '1.7.1';
 const APP_RELEASED = '2026-11-14';
 const CHANGELOG = [
+  ['1.7.1', '2026-11-14', ['ปุ่มยืนยันเข้าเรียนไม่หลุดจอแล้ว: บนคอมฟอร์มติดอยู่กับที่ รายชื่อเลื่อนในกรอบของตัวเอง', 'มือถือมีปุ่มลอย "ไปเช็คชื่อ"', 'รายชื่อแสดงทีละ 60 คน รองรับห้องใหญ่หลักพันคน']],
   ['1.7.0', '2026-11-14', ['ยกเลิกโหมดเดโม ใช้ข้อมูลจาก Google Sheet อย่างเดียว', 'เอารายชื่อและข้อมูลตัวอย่างออกจากหน้าเว็บ']],
   ['1.6.0', '2026-11-14', ['สร้างฐานข้อมูล Google Sheet พร้อมรับข้อมูลเช็คชื่อ', 'Apps Script ผูกกับชีตใน Google Drive', 'ชีตสรุปสถิติรายคนด้วยสูตร']],
   ['1.5.0', '2026-11-14', ['มีม GIF ยศน้องใหม่ (new) พร้อมคำบรรยายใหม่', 'มีมครบทุกยศแล้ว']],
@@ -334,7 +346,7 @@ function api(fn, arg){
 }
 
 /* =================== state & render =================== */
-let DATA = null, filter = 'all', query = '', busy = false;
+let DATA = null, filter = 'all', query = '', busy = false, showN = 60;   // แสดงรายชื่อทีละ 60 คน
 const openSet = new Set();
 
 function shell(){
@@ -380,12 +392,27 @@ function shell(){
 
   $('#clear').onclick = clearSig;
   $('#go').onclick = submit;
-  $('#q').oninput = e => { query = e.target.value.trim().toLowerCase(); renderList(); };
+  $('#q').oninput = e => { query = e.target.value.trim().toLowerCase(); showN = 60; renderList(); };
   $('#refresh').onclick = () => load(true);
   $('#verBadge').onclick = $('#verFoot').onclick = showChangelog;
   loadGitHubInfo();
   initPad();
   initCombo();
+  initFab();
+}
+
+/* ปุ่มลอย "ไปเช็คชื่อ" บนมือถือ: โผล่เมื่อเลื่อนลงไปดูรายชื่อจนฟอร์มหลุดจอ */
+function initFab(){
+  let fab = $('#fab');
+  if (!fab) {
+    fab = document.createElement('button'); fab.id = 'fab'; fab.className = 'fab'; fab.type = 'button';
+    fab.textContent = '✍️ ไปเช็คชื่อ'; document.body.appendChild(fab);
+    fab.onclick = () => document.querySelector('label[for="whoInput"]').scrollIntoView({behavior: 'smooth', block: 'start'});
+  }
+  let ticking = false;
+  const check = () => { ticking = false; const g = $('#go'); if (g) fab.classList.toggle('show', g.getBoundingClientRect().bottom < 0); };
+  window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(check); } }, {passive: true});
+  check();
 }
 
 function derive(){
@@ -412,7 +439,7 @@ function statsFor(id, d){
 function render(){
   const s = DATA.settings;
   $('#cname').textContent = s.className;
-  $('#srvVer').textContent = DATA.version ? ` · เซิร์ฟเวอร์ v${DATA.version}` + (DATA.version !== APP_VERSION ? ' ⚠️ ไม่ตรงกับหน้าเว็บ' : '') : '';
+  $('#srvVer').textContent = DATA.version ? ` · เซิร์ฟเวอร์ v${DATA.version}` + (DATA.version.split('.').slice(0, 2).join('.') !== APP_VERSION.split('.').slice(0, 2).join('.') ? ' ⚠️ ไม่ตรงกับหน้าเว็บ' : '') : '';
   const fm = s.formMeme || CFG.FORM_MEME_URL || FORM_MEME_DEFAULT, box = $('#formmeme');
   if (box.dataset.src !== fm) {
     box.dataset.src = fm;
@@ -437,7 +464,7 @@ function render(){
   const counts = {all: tot, here: here.length, late, no: tot - here.length};
   $('#tabs').innerHTML = [['all','ทั้งหมด'],['here','มาแล้ว'],['late','สาย'],['no','ยังไม่มา']]
     .map(([k, l]) => `<button class="tab ${filter === k ? 'on' : ''}" data-k="${k}">${l} ${counts[k]}</button>`).join('');
-  $('#tabs').querySelectorAll('.tab').forEach(b => b.onclick = () => { filter = b.dataset.k; render(); });
+  $('#tabs').querySelectorAll('.tab').forEach(b => b.onclick = () => { filter = b.dataset.k; showN = 60; render(); });
   renderList(d);
 }
 
@@ -456,7 +483,8 @@ function renderList(d = derive()){
   });
   if (!rows.length) { $('#list').innerHTML = '<div class="empty"><div>🦗</div>ว่างเปล่า... มีแต่เสียงจิ้งหรีด</div>'; return; }
 
-  $('#list').innerHTML = rows.map(st => {
+  const total = rows.length, view = rows.slice(0, showN);
+  $('#list').innerHTML = view.map(st => {
     const r = d.todayMap[st.id], k = r ? cls(r.status) : 'no', S = statsFor(st.id, d), rk = rankOf(S.rate, S.total);
     const ringColor = S.rate >= 80 ? 'var(--green)' : S.rate >= 60 ? 'var(--amber)' : 'var(--red)';
     return `<div class="item ${openSet.has(st.id) ? 'open' : ''}" data-id="${esc(st.id)}">
@@ -487,7 +515,7 @@ function renderList(d = derive()){
         </div>
       </div></div></div>
     </div>`;
-  }).join('');
+  }).join('') + (total > showN ? `<button class="more" type="button" id="more">แสดงเพิ่มอีก ${Math.min(60, total - showN)} คน<small>แสดงอยู่ ${showN} จาก ${total} คน · พิมพ์ค้นหาด้านบนจะเร็วกว่า</small></button>` : '');
 
   $('#list').querySelectorAll('.ih').forEach(b => b.onclick = () => {
     const it = b.parentElement, id = it.dataset.id, on = !openSet.has(id);
@@ -500,6 +528,7 @@ function renderList(d = derive()){
     setWho(b.dataset.pick);
     $('#form').scrollIntoView({behavior: 'smooth', block: 'start'});
   });
+  if ($('#more')) $('#more').onclick = () => { showN += 60; renderList(); };
 }
 
 function loadMemeImgs(el){ el.querySelectorAll('img[data-src],iframe[data-src],video[data-src]').forEach(i => { i.src = i.dataset.src; i.removeAttribute('data-src'); }); }
