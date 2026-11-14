@@ -20,6 +20,9 @@
 ├── apps-script/
 │   ├── Code.gs             โค้ดฝั่ง Google Sheet (API อ่าน/บันทึกข้อมูล)
 │   └── appsscript.json     ตั้งค่าโปรเจกต์ (เขตเวลา Asia/Bangkok)
+├── data/
+│   ├── students.xlsx       รายชื่อผู้เข้าเรียน (รูปแบบเดียวกับชีต Students)
+│   └── students.csv        ไฟล์เดียวกันแบบ CSV สำหรับ File > Import ใน Google Sheet
 ├── assets/               ไฟล์ต้นฉบับมีม (ในหน้าเว็บฝังไว้แล้ว)
 └── README.md
 ```
