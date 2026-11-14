@@ -49,8 +49,6 @@ button,input,select{font:inherit;color:inherit}
 .clock .d{font-size:13px;color:var(--muted)}
 .mood{display:inline-block;margin-top:4px;font-size:13px;padding:2px 10px;border-radius:99px;background:rgba(57,255,136,.12);color:var(--green)}
 .mood.late{background:rgba(255,210,63,.12);color:var(--amber)}
-.demo{background:repeating-linear-gradient(45deg,#ffd23f 0 12px,#111 12px 24px);padding:2px;border-radius:12px;margin-bottom:14px}
-.demo div{background:#111;border-radius:10px;padding:8px 12px;font-size:14px;color:var(--amber)}
 .setup{max-width:520px;margin:12vh auto 0;text-align:center;background:var(--panel);border:2px solid var(--green3);border-radius:var(--r);padding:28px 22px;box-shadow:8px 8px 0 #000}
 .setup .e{font-size:64px}
 .setup h2{margin:6px 0 8px}
@@ -219,9 +217,10 @@ select:focus,input:focus{border-color:var(--green2);box-shadow:0 0 0 3px var(--g
 <script>
 /* =================== เวอร์ชัน =================== */
 // อัปเดตทุกครั้งที่ปล่อยเวอร์ชันใหม่ (ดูรายละเอียดใน CHANGELOG.md)
-const APP_VERSION = '1.6.0';
+const APP_VERSION = '1.7.0';
 const APP_RELEASED = '2026-11-14';
 const CHANGELOG = [
+  ['1.7.0', '2026-11-14', ['ยกเลิกโหมดเดโม ใช้ข้อมูลจาก Google Sheet อย่างเดียว', 'เอารายชื่อและข้อมูลตัวอย่างออกจากหน้าเว็บ']],
   ['1.6.0', '2026-11-14', ['สร้างฐานข้อมูล Google Sheet พร้อมรับข้อมูลเช็คชื่อ', 'Apps Script ผูกกับชีตใน Google Drive', 'ชีตสรุปสถิติรายคนด้วยสูตร']],
   ['1.5.0', '2026-11-14', ['มีม GIF ยศน้องใหม่ (new) พร้อมคำบรรยายใหม่', 'มีมครบทุกยศแล้ว']],
   ['1.4.0', '2026-11-14', ['แสดงเลขเวอร์ชันบนหน้าเว็บ + ประวัติการอัปเดต', 'มีม GIF ยศตัวตึง (top)', 'เชื่อม GitHub Pages']],
@@ -307,7 +306,7 @@ const FORM_MEME_DEFAULT = 'data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28
 const CFG = window.APP_CONFIG || {};
 const IS_GAS = typeof google !== 'undefined' && google.script && google.script.run;
 const API_URL = !IS_GAS && /^https:\/\/script\.google\.com\//.test(CFG.API_URL || '') ? CFG.API_URL : '';
-const MODE = IS_GAS ? 'gas' : API_URL ? 'api' : 'demo';   // ไม่ได้ใส่ API_URL = โหมดเดโม
+const MODE = IS_GAS ? 'gas' : API_URL ? 'api' : 'none';   // ไม่ได้ใส่ API_URL = ยังไม่ได้เชื่อมชีต
 
 /* เรียก Apps Script Web App ผ่าน fetch (ใช้ตอนเปิดเว็บจาก GitHub Pages) */
 async function viaFetch(fn, arg){
@@ -329,82 +328,10 @@ function api(fn, arg){
       google.script.run.withSuccessHandler(res)
         .withFailureHandler(e => rej(new Error((e && e.message) || String(e))))[fn](arg);
     } else {
-      setTimeout(() => { try { res(Demo[fn](arg)); } catch (e) { rej(e); } }, 300);
+      rej(new Error('ยังไม่ได้เชื่อม Google Sheet'));
     }
   });
 }
-
-/* =================== โหมดเดโม (ข้อมูลเก็บในเบราว์เซอร์นี้เท่านั้น) =================== */
-const Demo = (() => {
-  const KEY = 'meme-attn-demo-v4'; let mem = null;
-  const ymd = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-  const hms = d => `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-  const ROSTER = [["P01", "นายกิตติธัช ธูปถมพงศ์", "Foodle Noodle Co., Ltd."], ["P02", "นางสาววิภาดา พลาธนพร", "Foodle Noodle Co., Ltd."], ["P03", "นายวิศรุต สุดสัตย์", "Foodle Noodle Co., Ltd."], ["P04", "นายสิริวรรณ รอดศิริ", "Foodle Noodle Co., Ltd."], ["P05", "นายคงติภูมิ มณีโชค", "บริษัท ซีเอ็ม พรีเมี่ยม ไรซ์ จำกัด"], ["P06", "นายนรพนธ์ จิรัฐิติกาลพงศ์", "บริษัท ซีเอ็ม พรีเมี่ยม ไรซ์ จำกัด"], ["P07", "นายคณาธิป จำนงค์", "บริษัท ลาโต้ ฟู้ดแอนด์ดริ้งส์ จำกัด"], ["P08", "นางสาวพรพิมล ผลเพิ่ม", "บริษัท ลาโต้ ฟู้ดแอนด์ดริ้งส์ จำกัด"], ["P09", "นางสาวรัตติยากร ฉายหิรัญ", "บริษัท สยาม คอนซูมเมอร์ โปรดักส์ จำกัด"], ["P10", "นายวิชยุตม์ กีรติธนาภรณ์", "บริษัท เมอร์เดียนท์ จำกัด"], ["P11", "นางสาวจิตรา คำแหง", "บริษัท โอชาฟูดแพ็ค จำกัด"], ["P12", "นางสาวณัฏชา แสวงหอม", "บริษัท โอชาฟูดแพ็ค จำกัด"], ["P13", "นางสาวธนวรรณ ตั้งตรงพานิช", "บริษัท โอชาฟูดแพ็ค จำกัด"], ["P14", "นางสาวนัทธมน พุทธพรม", "บริษัท โอชาฟูดแพ็ค จำกัด"], ["P15", "นางสาวระวีวรรณ การภักดี", "บริษัท โอชาฟูดแพ็ค จำกัด"], ["P16", "นางสาววราภรณ์ หวานล้ำ", "บริษัท โอชาฟูดแพ็ค จำกัด"], ["P17", "นางสาวอรณิชา ครองศักดิ์ศิริ", "บริษัท โอชาฟูดแพ็ค จำกัด"], ["P18", "นางสาวจิดาภา ทองเกิด", "เทพผดุงพรมะพร้าว จำกัด"], ["P19", "นางสาวพิชญา พิสุทธิ์พิเชฎฐ์", "เทพผดุงพรมะพร้าว จำกัด"], ["P20", "นางสาววันทนา จุตาลานนท์", "เทพผดุงพรมะพร้าว จำกัด"], ["P21", "นางสาวสุชาดา เอี่ยมสำอางค์", "เทพผดุงพรมะพร้าว จำกัด"], ["P22", "นายภณธกร วงศ์เจริญ", "เบทาโกร"]];
-  function seed(){
-    const students = ROSTER.map(([id, name, room]) => ({id, name, room}));
-    const settings = {className: 'คอร์สสร้างเว็บแอปด้วย Claude', startTime: '08:30', lateMinutes: 15, formMeme: ''};
-    let seedN = 20261114;
-    const rnd = () => { seedN = (seedN * 1103515245 + 12345) % 2147483648; return seedN / 2147483648; };
-    const days = []; const d = new Date();
-    while (days.length < 10) { d.setDate(d.getDate() - 1); if (d.getDay() !== 0 && d.getDay() !== 6) days.unshift(ymd(d)); }
-    const P = {
-      top:   [{abs: [], late: []}, {abs: [], late: [3]}, {abs: [], late: []}],
-      good:  [{abs: [6], late: [2, 8]}, {abs: [3], late: [5]}, {abs: [8], late: [1, 4, 7]}],
-      risk:  [{abs: [1, 5, 8], late: [3, 9]}, {abs: [0, 4, 7], late: [2]}, {abs: [2, 3, 9], late: [6, 7]}],
-      ghost: [{abs: [0, 1, 3, 4, 6, 7, 9], late: [8]}, {abs: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], late: []}, {abs: [1, 2, 4, 5, 7, 8], late: [3]}],
-      new:   [{abs: [], late: [], from: 8}, {abs: [], late: [9], from: 9}],
-    };
-    const plan = ['top','good','risk','ghost','top','good','risk','top','good','ghost','new','top','good','risk','top','good','ghost','top','new','good','risk','top'];
-    const used = {}, records = [];
-    const sig = () => {
-      try {
-        const c = document.createElement('canvas'); c.width = 360; c.height = 140; const x = c.getContext('2d');
-        x.strokeStyle = '#39ff88'; x.lineWidth = 3; x.lineCap = 'round'; x.beginPath();
-        let px = 30; x.moveTo(px, 80);
-        for (let i = 0; i < 9; i++) { const nx = px + 25 + rnd() * 15, ny = 40 + rnd() * 70; x.quadraticCurveTo((px + nx) / 2, ny - 30 + rnd() * 60, nx, ny); px = nx; }
-        x.stroke(); x.beginPath(); x.moveTo(40, 112); x.lineTo(px, 104); x.stroke();
-        return c.toDataURL('image/png');
-      } catch (e) { return ''; }
-    };
-    students.forEach((s, i) => {
-      const kind = plan[i % plan.length]; used[kind] = used[kind] || 0;
-      const p = P[kind][used[kind]++ % P[kind].length];
-      days.forEach((ds, k) => {
-        if (k < (p.from || 0) || p.abs.includes(k)) return;
-        const late = p.late.includes(k);
-        const m = late ? 47 + Math.floor(rnd() * 30) : 10 + Math.floor(rnd() * 34);
-        records.push({date: ds, time: fromMin(8 * 60 + m) + ':' + pad(Math.floor(rnd() * 60)), id: s.id, name: s.name, status: late ? 'สาย' : 'ตรงเวลา', sig: ''});
-      });
-    });
-    const today = ymd(new Date());
-    [['P01','08:12:41','ตรงเวลา'],['P05','08:19:05','ตรงเวลา'],['P08','08:27:33','ตรงเวลา'],['P12','08:33:10','ตรงเวลา'],
-     ['P02','08:41:52','ตรงเวลา'],['P03','08:52:18','สาย'],['P14','09:06:44','สาย']].forEach(([id, time, status]) => {
-      const s = students.find(x => x.id === id); if (s) records.push({date: today, time, id, name: s.name, status, sig: sig()});
-    });
-    return {settings, students, records};
-  }
-  function load(){ if (mem) return mem; try { const s = localStorage.getItem(KEY); if (s) return (mem = JSON.parse(s)); } catch (e) {} return (mem = seed()); }
-  function save(){ try { localStorage.setItem(KEY, JSON.stringify(mem)); } catch (e) {} }
-  function getData(){
-    const m = load(), today = ymd(new Date());
-    return JSON.parse(JSON.stringify({settings: m.settings, students: m.students, memes: [], today,
-      records: m.records.map(r => ({...r, sig: r.date === today ? r.sig : ''}))}));
-  }
-  function checkIn(p){
-    const m = load(), now = new Date(), today = ymd(now), time = hms(now);
-    if (!p.id) throw new Error('กรุณาเลือกชื่อ');
-    if (!p.confirm) throw new Error('กรุณากดยืนยันว่าเข้าเรียนจริง');
-    if (!String(p.sig).startsWith('data:image/')) throw new Error('กรุณาเซ็นชื่อก่อนยืนยัน');
-    const st = m.students.find(s => s.id === p.id); if (!st) throw new Error('ไม่พบรหัสนี้ในรายชื่อ');
-    const dup = m.records.find(r => r.date === today && r.id === p.id);
-    if (dup) throw new Error(st.name + ' เช็คชื่อไปแล้วเมื่อ ' + dup.time.slice(0, 5) + ' น.');
-    const status = toMin(time) <= toMin(m.settings.startTime) + Number(m.settings.lateMinutes) ? 'ตรงเวลา' : 'สาย';
-    m.records.push({date: today, time, id: st.id, name: st.name, status, sig: p.sig}); save();
-    return {record: {name: st.name, time, status}, data: getData()};
-  }
-  function reset(){ mem = null; try { localStorage.removeItem(KEY); } catch (e) {} mem = seed(); return getData(); }
-  return {getData, checkIn, reset};
-})();
 
 /* =================== state & render =================== */
 let DATA = null, filter = 'all', query = '', busy = false;
@@ -412,7 +339,6 @@ const openSet = new Set();
 
 function shell(){
   $('#app').innerHTML = `
-  ${MODE !== 'demo' ? '' : '<div class="demo"><div>🧪 โหมดเดโม — ข้อมูลการเข้าเรียนเป็นตัวอย่าง เก็บในเบราว์เซอร์นี้เท่านั้น ใส่ลิงก์ Apps Script ใน config.js เพื่อบันทึกลง Google Sheet จริง</div></div>'}
   <div class="top">
     <div>
       <h1 class="meme-title">เช็คชื่อ <span>หรือ</span> โดนเช็คบิล</h1>
@@ -450,7 +376,7 @@ function shell(){
       <div class="list" id="list"></div>
     </section>
   </div>
-  <div class="foot"><button id="verFoot">เวอร์ชัน v${APP_VERSION}</button> · อัปเดต ${thLong(APP_RELEASED)}<span id="srvVer"></span><span id="ghInfo"></span><br>ข้อมูลอัปเดตอัตโนมัติทุก 30 วินาที · <button id="refresh">รีเฟรชเลย</button>${MODE !== 'demo' ? '' : ' · <button id="reset">รีเซ็ตข้อมูลเดโม</button>'}</div>`;
+  <div class="foot"><button id="verFoot">เวอร์ชัน v${APP_VERSION}</button> · อัปเดต ${thLong(APP_RELEASED)}<span id="srvVer"></span><span id="ghInfo"></span><br>ข้อมูลอัปเดตอัตโนมัติทุก 30 วินาที · <button id="refresh">รีเฟรชเลย</button></div>`;
 
   $('#clear').onclick = clearSig;
   $('#go').onclick = submit;
@@ -458,7 +384,6 @@ function shell(){
   $('#refresh').onclick = () => load(true);
   $('#verBadge').onclick = $('#verFoot').onclick = showChangelog;
   loadGitHubInfo();
-  if ($('#reset')) $('#reset').onclick = () => { DATA = Demo.reset(); openSet.clear(); render(); };
   initPad();
   initCombo();
 }
@@ -773,6 +698,13 @@ async function submit(){
 }
 
 async function load(manual){
+  if (MODE === 'none') {
+    $('#app').innerHTML = `<div class="setup"><div class="e">🔌🐸</div><h2>ยังไม่ได้เชื่อม Google Sheet</h2>
+      <p>ใส่ลิงก์ Apps Script Web App ในไฟล์ <code>config.js</code></p>
+      <p><code>API_URL: 'https://script.google.com/macros/s/.../exec'</code></p>
+      <p>ดูขั้นตอนทั้งหมดได้ใน README.md</p><p style="margin-top:14px">v${APP_VERSION}</p></div>`;
+    return;
+  }
   try {
     DATA = await api('getData');
     if (!$('#form')) shell();

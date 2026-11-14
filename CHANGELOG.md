@@ -7,6 +7,10 @@
 2. `APP_VERSION` ใน `apps-script/Code.gs` (แล้ว Deploy Apps Script เป็น New version)
 3. ไฟล์นี้
 
+## v1.7.0 — 2026-11-14
+- ยกเลิกโหมดเดโม: หน้าเว็บใช้ข้อมูลจาก Google Sheet อย่างเดียว ถ้ายังไม่ใส่ `API_URL` จะขึ้นหน้าแจ้งให้เชื่อมชีต
+- เอารายชื่อผู้เข้าเรียนและข้อมูลตัวอย่างออกจาก `index.html`
+
 ## v1.6.0 — 2026-11-14
 - สร้าง Google Sheet "Checkin_meme – ฐานข้อมูลเช็คชื่อ" ใน Google Drive: Students, Attendance, Summary, Settings, Memes, Registrations
 - ชีต Summary สรุปตรงเวลา/สาย/ขาด/% มาเรียน รายคนด้วยสูตร อัปเดตเองเมื่อมีการเช็คชื่อ
