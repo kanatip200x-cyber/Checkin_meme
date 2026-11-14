@@ -5,10 +5,10 @@
 
 // ถ้าสคริปต์ผูกกับชีต (Extensions > Apps Script) ปล่อยว่างไว้ได้
 // ถ้าเป็นสคริปต์แยก ให้ใส่ ID ของ Google Sheet ที่นี่
-const SPREADSHEET_ID = '';
+const SPREADSHEET_ID = '1K4fN9g4O32k9214KdSYTKW4b3c8WFrtYz6TByQIlU8U';   // Checkin_meme – ฐานข้อมูลเช็คชื่อ
 
 // เวอร์ชันฝั่งเซิร์ฟเวอร์ (ควรตรงกับ APP_VERSION ใน index.html)
-const APP_VERSION = '1.5.0';
+const APP_VERSION = '1.6.0';
 
 const SHEET_STUDENTS = 'Students';
 const SHEET_ATT = 'Attendance';

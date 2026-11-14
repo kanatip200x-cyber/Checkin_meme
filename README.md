@@ -35,6 +35,9 @@
 
 ### 1) ตั้งค่า Google Sheet + Apps Script
 
+> **มีชีตพร้อมใช้แล้ว:** "Checkin_meme – ฐานข้อมูลเช็คชื่อ" ใน Google Drive (ID `1K4fN9g4O32k9214KdSYTKW4b3c8WFrtYz6TByQIlU8U`) มีชีต Students, Attendance, Summary, Settings, Memes, Registrations จัดรูปแบบไว้แล้ว และ `Code.gs` ชี้ไปที่ชีตนี้แล้ว ข้ามข้อ 1 และข้อ 4 ด้านล่างได้ เปิดชีตแล้วไปที่ Extensions → Apps Script ได้เลย
+
+
 1. สร้าง Google Sheet ใหม่ → เมนู **Extensions → Apps Script**
 2. วางเนื้อหา `apps-script/Code.gs` ลงในไฟล์ `Code.gs`
 3. **Project Settings** → ติ๊ก *Show "appsscript.json" manifest file* → วางเนื้อหา `apps-script/appsscript.json`
