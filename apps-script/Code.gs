@@ -7,6 +7,9 @@
 // ถ้าเป็นสคริปต์แยก ให้ใส่ ID ของ Google Sheet ที่นี่
 const SPREADSHEET_ID = '';
 
+// เวอร์ชันฝั่งเซิร์ฟเวอร์ (ควรตรงกับ APP_VERSION ใน index.html)
+const APP_VERSION = '1.4.0';
+
 const SHEET_STUDENTS = 'Students';
 const SHEET_ATT = 'Attendance';
 const SHEET_SET = 'Settings';
@@ -119,7 +122,7 @@ function setup() {
   if (me.getLastRow() === 0) {
     me.getRange(1, 1, 1, 5).setValues([['หมวด', 'ลิงก์รูป/GIF (Tenor, ลิงก์รูปตรง หรือ Google Drive)', 'คำบรรยายบน (ใส่ - = ไม่มี)', 'คำบรรยายล่าง (ใส่ - = ไม่มี)', 'ใช้กับใคร']]).setFontWeight('bold');
     me.getRange(2, 1, 5, 5).setValues([
-      ['top',   '', 'ครูเช็คชื่อทุกคาบ', '{name}: มาครบ ไม่เคยพลาด', 'มาเรียน ≥ 95%'],
+      ['top',   '', 'เข้ามาเรียนไว', 'ไม่มีใครให้คุยด้วย', 'มาเรียน ≥ 95%'],
       ['good',  '', '-', 'อย่าให้มีครั้งที่ 2', 'มาเรียน 80–94%'],
       ['risk',  '', 'ฉันรู้ว่าคุณต้องมา', 'ฉันอยู่นี่แล้ว', 'มาเรียน 60–79%'],
       ['ghost', '', 'ครู: {name} มาไหม', 'ทั้งห้อง: ใครอะ?', 'มาเรียน < 60%'],
@@ -259,6 +262,7 @@ function getData() {
     records: readRecords_(today),
     memes: readMemes_(),
     today: today,
+    version: APP_VERSION,
   };
 }
 
