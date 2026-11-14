@@ -2,7 +2,7 @@
  * ตั้งค่าการเชื่อมต่อ Google Sheet
  * วางลิงก์ Web App ที่ได้จาก Apps Script (Deploy > New deployment > Web app)
  * ลิงก์จะหน้าตาประมาณ: https://script.google.com/macros/s/XXXXXXXXXXXX/exec
- * ต้องใส่ลิงก์นี้ หน้าเว็บจึงจะใช้งานได้ (อ่าน/บันทึกข้อมูลกับ Google Sheet)
+ * ถ้าปล่อยว่าง หน้าเว็บจะทำงานในโหมดเดโม (ข้อมูลตัวอย่าง ไม่บันทึกลงชีต)
  */
 window.APP_CONFIG = {
   API_URL: '',
