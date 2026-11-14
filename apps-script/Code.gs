@@ -8,7 +8,7 @@
 const SPREADSHEET_ID = '';
 
 // เวอร์ชันฝั่งเซิร์ฟเวอร์ (ควรตรงกับ APP_VERSION ใน index.html)
-const APP_VERSION = '1.4.0';
+const APP_VERSION = '1.5.0';
 
 const SHEET_STUDENTS = 'Students';
 const SHEET_ATT = 'Attendance';
@@ -126,7 +126,7 @@ function setup() {
       ['good',  '', '-', 'อย่าให้มีครั้งที่ 2', 'มาเรียน 80–94%'],
       ['risk',  '', 'ฉันรู้ว่าคุณต้องมา', 'ฉันอยู่นี่แล้ว', 'มาเรียน 60–79%'],
       ['ghost', '', 'ครู: {name} มาไหม', 'ทั้งห้อง: ใครอะ?', 'มาเรียน < 60%'],
-      ['new',   '', 'เพิ่งเริ่มคาบแรก', 'ยังไม่มีอะไรให้แซว', 'ยังไม่มีประวัติ'],
+      ['new',   '', 'ทุกคนดูนี่!', 'สมาชิกใหม่ของห้อง {name}', 'เรียนมาไม่ถึง 3 คาบ'],
     ]);
     me.setFrozenRows(1);
     me.setColumnWidth(2, 380);
