@@ -10,6 +10,7 @@
 ## v1.7.0 — 2026-11-14
 - ยกเลิกโหมดเดโม: หน้าเว็บใช้ข้อมูลจาก Google Sheet อย่างเดียว ถ้ายังไม่ใส่ `API_URL` จะขึ้นหน้าแจ้งให้เชื่อมชีต
 - เอารายชื่อผู้เข้าเรียนและข้อมูลตัวอย่างออกจาก `index.html`
+- เชื่อมเว็บกับ Google Sheet จริงผ่าน Apps Script "Checkin_meme API" และโหลด `config.js` ใหม่ทุกครั้ง (ไม่ติดแคชเบราว์เซอร์)
 
 ## v1.6.0 — 2026-11-14
 - สร้าง Google Sheet "Checkin_meme – ฐานข้อมูลเช็คชื่อ" ใน Google Drive: Students, Attendance, Summary, Settings, Memes, Registrations
