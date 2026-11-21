@@ -1,14 +1,9 @@
 /**
- * ตั้งค่าการเชื่อมต่อ Google Sheet
- * วางลิงก์ Web App ที่ได้จาก Apps Script (Deploy > New deployment > Web app)
- * ลิงก์จะหน้าตาประมาณ: https://script.google.com/macros/s/XXXXXXXXXXXX/exec
- * ต้องใส่ลิงก์นี้ หน้าเว็บจึงจะใช้งานได้ (ถ้าว่าง จะขึ้นหน้า "ยังไม่ได้เชื่อม Google Sheet")
+ * ตั้งค่าการเชื่อมต่อ Supabase (ฐานข้อมูล + ล็อกอินด้วย Google)
+ * ค่าเหล่านี้เปิดเผยได้ (publishable key) ความปลอดภัยของข้อมูลคุมด้วย Row Level Security ในฐานข้อมูล
+ * ห้ามใส่ service_role key หรือ secret key ในไฟล์นี้เด็ดขาด
  */
 window.APP_CONFIG = {
-  API_URL: 'https://script.google.com/macros/s/AKfycbwPLIGIbNp8UOqU8l_TVU6AgSbiHFsk9SBalE3Am3SLfa2h1ZOl-9kUX3nvn-qD-7UHyA/exec',
-
-  // (ไม่บังคับ) เปลี่ยนมีมใต้ข้อความ "เลือกชื่อตัวเอง เซ็นชื่อ..." ปล่อยว่าง = ใช้มีมที่ฝังไว้ในหน้าเว็บ
-  // ใส่ได้ทั้งลิงก์ Tenor, ลิงก์รูป/GIF หรือไฟล์ในโปรเจกต์ เช่น 'assets/form-meme.mp4'
-  // ถ้าตั้งค่า "มีมใต้คำแนะนำ" ในชีต Settings ไว้ ค่าในชีตจะถูกใช้ก่อน
-  FORM_MEME_URL: ''
+  SUPABASE_URL: 'https://ikevmgalkqpynhyvjqtx.supabase.co',
+  SUPABASE_KEY: 'sb_publishable_XFgRvFSL_2lYePAXooBqdw_xYR5zG6a'
 };

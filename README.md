@@ -1,99 +1,72 @@
 # 🐸 เช็คชื่อ หรือ โดนเช็คบิล — ระบบเช็คชื่อออนไลน์
 
-เว็บเช็คชื่อเข้าเรียน ผู้เรียนลงชื่อและเซ็นยืนยันเอง ข้อมูลทั้งหมดบันทึกลง **Google Sheet**
+เว็บเช็คชื่อเข้าเรียน **ล็อกอินด้วย Google (Gmail)** แล้วเซ็นชื่อยืนยันเข้าเรียน ข้อมูลทั้งหมดเก็บใน **Supabase**
 ธีมดำ-เขียวสไตล์มีม ใช้ได้ทั้ง PC, แท็บเล็ต และมือถือ
 
 🌐 **เว็บไซต์:** https://kanatip200x-cyber.github.io/Checkin_meme/
-📦 **เวอร์ชันปัจจุบัน:** v1.7.2 — ดู [CHANGELOG.md](CHANGELOG.md)
+📦 **เวอร์ชันปัจจุบัน:** v2.0.0 — ดู [CHANGELOG.md](CHANGELOG.md)
 
 ## ความสามารถ
 
-- ✍️ เลือกชื่อ (พิมพ์ค้นหาได้ทั้งชื่อ รหัส หน่วยงาน) → เซ็นชื่อ → ติ๊กยืนยัน → บันทึกลงชีต
-- ⏰ บันทึกเวลาเข้าเรียน และตัดสิน "ตรงเวลา / สาย" อัตโนมัติจากเวลาที่ตั้งไว้
-- 🚫 กันเช็คชื่อซ้ำในวันเดียวกัน
-- 👥 รายชื่อทั้งหมด กรอง มาแล้ว / สาย / ยังไม่มา และค้นหาได้
-- 📊 กดที่ชื่อเพื่อเปิด/ปิดสถิติรายบุคคล: % การมาเรียน, จำนวนครั้ง, ประวัติย้อนหลัง, ลายเซ็นวันนี้ พร้อมการ์ดมีม (GIF จาก Tenor ได้)
-- 🔄 อัปเดตข้อมูลอัตโนมัติทุก 30 วินาที
+- 🔐 ล็อกอินด้วยบัญชี Google ผ่าน Supabase Auth
+- 🐣 ล็อกอินครั้งแรกเลือกชื่อตัวเองครั้งเดียว ระบบผูกบัญชีกับชื่อนั้น ครั้งต่อไปไม่ต้องเลือกอีก
+- ✍️ เช็คชื่อได้เฉพาะชื่อตัวเอง (เพื่อนเซ็นแทนไม่ได้) วันละครั้ง เวลาและสถานะ "ตรงเวลา/สาย" คิดที่เซิร์ฟเวอร์ตามเวลาไทย
+- 👥 รายชื่อทั้งหมด กรอง/ค้นหา แสดงทีละ 60 คน รองรับหลักพันคน
+- 📊 สถิติรายบุคคล + การ์ดมีม GIF ตามยศการเข้าเรียน
+- 🛠️ แผงควบคุมครู (เฉพาะแอดมิน): ตั้งเวลาเรียน/สาย, เพิ่ม-ลบรายชื่อ, ยกเลิกการผูกบัญชี, ลบการเช็คชื่อ, ดาวน์โหลด CSV
 
-## โครงสร้างไฟล์
+## โครงสร้าง
 
 ```
-├── index.html              หน้าเว็บ (ขึ้น GitHub Pages)
-├── CHANGELOG.md            ประวัติการอัปเดตแต่ละเวอร์ชัน
-├── config.js               ใส่ลิงก์ Apps Script Web App ที่นี่
-├── apps-script/
-│   ├── Code.gs             โค้ดฝั่ง Google Sheet (API อ่าน/บันทึกข้อมูล)
-│   └── appsscript.json     ตั้งค่าโปรเจกต์ (เขตเวลา Asia/Bangkok)
-├── data/
-│   ├── students.xlsx       รายชื่อผู้เข้าเรียน (รูปแบบเดียวกับชีต Students)
-│   └── students.csv        ไฟล์เดียวกันแบบ CSV สำหรับ File > Import ใน Google Sheet
-├── assets/               ไฟล์ต้นฉบับมีม (ในหน้าเว็บฝังไว้แล้ว)
-└── README.md
+├── index.html              หน้าเว็บทั้งหมด (ขึ้น GitHub Pages)
+├── config.js               SUPABASE_URL + publishable key
+├── supabase/schema.sql     ตาราง, Row Level Security, ฟังก์ชัน RPC
+├── assets/                 ไฟล์ต้นฉบับมีม (ในหน้าเว็บฝังไว้แล้ว)
+├── data/                   รายชื่อผู้เข้าเรียน (ไฟล์อ้างอิง)
+└── CHANGELOG.md
 ```
 
-## การติดตั้ง
+## ฐานข้อมูล (Supabase project `checkin-meme`, ภูมิภาคสิงคโปร์)
 
-### 1) ตั้งค่า Google Sheet + Apps Script
+| ตาราง | เก็บอะไร | ใครอ่าน/เขียนได้ |
+|---|---|---|
+| `students` | รหัส, ชื่อ, หน่วยงาน, บัญชีที่ผูก | ทุกคนที่ล็อกอินอ่านได้ · แก้ได้เฉพาะแอดมิน |
+| `attendance` | วันที่, เวลา, สถานะ, ลายเซ็น | ของตัวเอง หรือแอดมิน · บันทึกผ่าน `check_in()` เท่านั้น |
+| `settings` | ชื่อวิชา, เวลาเข้าเรียน, สายเกินกี่นาที, มีม | อ่านได้ทุกคน · แก้ได้เฉพาะแอดมิน |
+| `memes` | ลิงก์รูป/GIF ตามยศ | อ่านได้ทุกคน · แก้ได้เฉพาะแอดมิน |
+| `admins` | อีเมลแอดมิน | เฉพาะแอดมิน |
 
-> **มีชีตพร้อมใช้แล้ว:** "Checkin_meme – ฐานข้อมูลเช็คชื่อ" ใน Google Drive (ID `1K4fN9g4O32k9214KdSYTKW4b3c8WFrtYz6TByQIlU8U`) มีชีต Students, Attendance, Summary, Settings, Memes, Registrations จัดรูปแบบไว้แล้ว และ `Code.gs` ชี้ไปที่ชีตนี้แล้ว ข้ามข้อ 1 และข้อ 4 ด้านล่างได้ เปิดชีตแล้วไปที่ Extensions → Apps Script ได้เลย
+ทุกตารางเปิด Row Level Security ผู้ใช้ที่ไม่ล็อกอินเข้าถึงข้อมูลไม่ได้เลย
 
+**ฟังก์ชัน (RPC):** `get_dashboard()` ข้อมูลทั้งหน้า · `claim_student(id)` ผูกบัญชีกับชื่อ · `check_in(signature)` เช็คชื่อ · `admin_unlink(id)` ยกเลิกการผูก (แอดมิน)
 
-1. สร้าง Google Sheet ใหม่ → เมนู **Extensions → Apps Script**
-2. วางเนื้อหา `apps-script/Code.gs` ลงในไฟล์ `Code.gs`
-3. **Project Settings** → ติ๊ก *Show "appsscript.json" manifest file* → วางเนื้อหา `apps-script/appsscript.json`
-4. เลือกฟังก์ชัน `setup` → กด **Run** → อนุญาตสิทธิ์
-   ระบบจะสร้างชีต `Students`, `Attendance`, `Settings`, `Memes` พร้อมรายชื่อผู้เรียน
-5. **Deploy → New deployment → Web app**
-   - Execute as: **Me**
-   - Who has access: **Anyone**
-6. คัดลอกลิงก์ Web app (ลงท้ายด้วย `/exec`)
-
-### 2) เชื่อมหน้าเว็บกับชีต
-
-เปิด `config.js` แล้ววางลิงก์:
-
-```js
-window.APP_CONFIG = {
-  API_URL: 'https://script.google.com/macros/s/XXXXXXXX/exec'
-};
+**เพิ่มแอดมิน:** Supabase Dashboard → SQL Editor →
+```sql
+insert into public.admins (email) values ('someone@gmail.com');
 ```
 
-> ถ้ายังไม่ใส่ลิงก์ หน้าเว็บจะขึ้นข้อความ "ยังไม่ได้เชื่อม Google Sheet"
+## ตั้งค่าล็อกอินด้วย Google (ทำครั้งเดียว)
 
-### 3) ขึ้น GitHub Pages
+1. **Google Cloud Console** → APIs & Services → Credentials → Create credentials → **OAuth client ID**
+   - Application type: **Web application**
+   - Authorized JavaScript origins: `https://kanatip200x-cyber.github.io`
+   - Authorized redirect URIs: `https://ikevmgalkqpynhyvjqtx.supabase.co/auth/v1/callback`
+   - (ถ้ายังไม่เคยตั้ง OAuth consent screen ให้ตั้งเป็น External และเพิ่มอีเมลตัวเองเป็น test user หรือกด Publish)
+2. **Supabase Dashboard** → Authentication → Sign In / Providers → **Google** → เปิดใช้ → วาง Client ID และ Client Secret → Save
+3. **Supabase Dashboard** → Authentication → URL Configuration
+   - Site URL: `https://kanatip200x-cyber.github.io/Checkin_meme/`
+   - Redirect URLs: เพิ่ม `https://kanatip200x-cyber.github.io/Checkin_meme/**`
 
-1. สร้าง repository ใหม่ แล้วอัปโหลดไฟล์ทั้งหมด
-2. **Settings → Pages** → Source: *Deploy from a branch* → Branch: `main` / `(root)` → Save
-3. รอสักครู่ จะได้ลิงก์ `https://<username>.github.io/<repo>/` ส่งให้ผู้เรียนได้เลย
+## ติดตั้งใหม่ในโปรเจกต์ Supabase อื่น
 
-### (ทางเลือก) ใช้แค่ Apps Script ไม่ใช้ GitHub
-
-ใน Apps Script กด **+ → HTML** ตั้งชื่อ `index` แล้ววางเนื้อหา `index.html` → Deploy ใหม่
-เปิดลิงก์ `/exec` ก็จะเห็นหน้าเว็บทันที
-
-## การใช้งานชีต
-
-| ชีต | ใช้ทำอะไร |
-|---|---|
-| `Students` | รายชื่อ: รหัส / ชื่อ-นามสกุล / หน่วยงาน (เพิ่ม-ลบได้ตลอด) |
-| `Attendance` | บันทึกการเข้าเรียน: วันที่ / เวลา / รหัส / ชื่อ / สถานะ / ลายเซ็น (base64) |
-| `Settings` | ชื่อวิชา, เวลาเข้าเรียน (เช่น `08:30`), สายเกินกี่นาที, `มีมใต้คำแนะนำ` (ปล่อยว่าง = ใช้มีมที่ฝังในหน้าเว็บ หรือใส่ลิงก์ GIF/รูปเพื่อเปลี่ยน) |
-| `Memes` | ลิงก์รูป/GIF และคำบรรยายตามยศ: `top` `good` `risk` `ghost` `new` |
-
-**การ์ดมีม:** วางลิงก์ GIF จาก Tenor (คลิกขวา → คัดลอกที่อยู่รูปภาพ หรือลิงก์หน้า `tenor.com/view/...`), ลิงก์รูปตรง หรือลิงก์ Google Drive (แชร์แบบทุกคนที่มีลิงก์)
-ใช้ `{name}` ในคำบรรยายเพื่อแทนชื่อ และใส่ `-` ถ้าไม่ต้องการคำบรรยาย
-ทุกหมวด (`top` `good` `risk` `ghost` `new`) มีรูป/GIF ฝังไว้ในหน้าเว็บแล้ว (ใช้อัตโนมัติถ้าไม่ได้ใส่ลิงก์ในชีต) ไฟล์ต้นฉบับอยู่ที่ `assets/`
-
-## เวอร์ชัน
-
-เลขเวอร์ชันแสดงข้างชื่อเว็บและท้ายหน้า (กดเพื่อดูประวัติการอัปเดต) ถ้าเชื่อมชีตแล้ว ท้ายหน้าจะแสดงเวอร์ชันของ Apps Script ด้วย และเตือน ⚠️ ถ้าไม่ตรงกับหน้าเว็บ ขั้นตอนปล่อยเวอร์ชันใหม่อยู่ใน [CHANGELOG.md](CHANGELOG.md)
-
-## อัปเดตโค้ด Apps Script
-
-แก้โค้ดแล้วต้อง **Deploy → Manage deployments → ✏️ → Version: New version** ลิงก์ `/exec` เดิมจะใช้ต่อได้ ไม่ต้องแก้ `config.js`
+1. สร้างโปรเจกต์ใน Supabase → SQL Editor → วาง `supabase/schema.sql` → Run
+2. เพิ่มอีเมลแอดมินในตาราง `admins` และรายชื่อในตาราง `students` (หรือเพิ่มจากแผงควบคุมครูบนเว็บ)
+3. แก้ `config.js` ให้เป็น Project URL และ **publishable key** ของโปรเจกต์ใหม่ (ห้ามใช้ service_role / secret key)
+4. ตั้งค่าล็อกอินด้วย Google ตามหัวข้อด้านบน
+5. อัปโหลดขึ้น GitHub → Settings → Pages → Deploy from branch `main` / root
 
 ## หมายเหตุด้านความปลอดภัย
 
-- ใครมีลิงก์ก็เช็คชื่อได้ (ไม่มีระบบล็อกอิน) ลายเซ็นที่เก็บไว้ใช้เป็นหลักฐานตรวจย้อนหลัง
-- ลิงก์ Apps Script ใน `config.js` เป็นข้อมูลสาธารณะเมื่อขึ้น GitHub ตามปกติ — แต่ **อย่า** commit ข้อมูลส่วนตัว (เบอร์โทร, อีเมล) ของผู้เรียนลงใน repository
-- รายชื่อเริ่มต้นอยู่ในตัวแปร `ROSTER` ใน `apps-script/Code.gs` ถ้า repository เป็น **Public** ควรพิจารณาลบรายชื่อออกจากไฟล์ แล้วกรอกในชีตแทน (`index.html` ไม่มีรายชื่อ)
+- `config.js` มีแค่ publishable key ซึ่งเปิดเผยได้ ข้อมูลถูกป้องกันด้วย RLS ในฐานข้อมูล
+- ใครก็ล็อกอินด้วย Google ได้ แต่จะเห็นข้อมูลก็ต่อเมื่อล็อกอินแล้ว และผูกได้เฉพาะชื่อที่ยังไม่มีคนผูก ถ้ามีคนผูกผิด แอดมินกด "ยกเลิกการผูกบัญชี" ได้
+- รายชื่อจริงอยู่ใน `data/` ของ repo ถ้า repository เป็น Public ควรพิจารณาลบโฟลเดอร์นี้
